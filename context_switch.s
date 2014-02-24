@@ -29,7 +29,7 @@ SVC_Handler:
 	mrs r0, psp
 	
 	/*
-	 * this r7 is useless
+	 * this r7 is used for padding
 	 * hardware interrupt need r7 and activate pop r7 so SVC store it
 	 */
 	stmdb r0!, {r7}
