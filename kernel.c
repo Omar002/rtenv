@@ -6,6 +6,9 @@
 #include <stddef.h>
 
 void *memcpy(void *dest, const void *src, size_t n);
+void check_keyword();
+void find_events();
+void itoa(int n, char *dst, int base);
 
 int strcmp(const char *a, const char *b) __attribute__ ((naked));
 int strcmp(const char *a, const char *b)
