@@ -27,6 +27,11 @@ USART2_IRQHandler:
 SVC_Handler:
 	/* save user state */
 	mrs r0, psp
+	
+	/*
+	 * this r7 is useless
+	 * hardware interrupt need r7 and activate pop r7 so SVC store it
+	 */
 	stmdb r0!, {r7}
 	stmdb r0!, {r4, r5, r6, r7, r8, r9, r10, r11, lr}
 
@@ -34,6 +39,7 @@ SVC_Handler:
 	pop {r4, r5, r6, r7, r8, r9, r10, r11, ip, lr}
 	msr psr, ip
 	
+	/* jump to the next line where activate is called */
 	bx lr
 
 	.global activate
@@ -43,6 +49,7 @@ activate:
 	push {r4, r5, r6, r7, r8, r9, r10, r11, ip, lr}
 	
 	/* switch to process stack pointer */
+	/* reference: Cortex-M3 Devices Generic User Guide Core registers */
 	msr psp, r0
 	mov r0, #3
 	msr control, r0
