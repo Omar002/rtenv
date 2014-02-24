@@ -18,7 +18,7 @@ USART2_IRQHandler:
 
 	/* load kernel state */
 	pop {r4, r5, r6, r7, r8, r9, r10, r11, ip, lr}
-	msr psr, ip
+	msr apsr_nzcvq, ip
 
 	bx lr
 
@@ -37,7 +37,7 @@ SVC_Handler:
 
 	/* load kernel state */
 	pop {r4, r5, r6, r7, r8, r9, r10, r11, ip, lr}
-	msr psr, ip
+	msr apsr_nzcvq, ip
 	
 	/* jump to the next line where activate is called */
 	bx lr
