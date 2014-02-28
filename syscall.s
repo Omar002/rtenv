@@ -66,3 +66,10 @@ sleep:
 	svc 0
 	pop {r7}
 	bx lr
+.global new_task
+new_task:
+	push {r7}
+	mov r7, #0xa
+	svc 0
+	pop {r7}
+	bx lr

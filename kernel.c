@@ -1,6 +1,6 @@
 #include "stm32f10x.h"
 #include "RTOSConfig.h"
-
+#include "core_cm3.h"
 #include "syscall.h"
 
 #include <stddef.h>
@@ -109,7 +109,7 @@ void show_cmd_info(int argc, char *argv[]);
 void show_task_info(int argc, char *argv[]);
 void show_man_page(int argc, char *argv[]);
 void show_history(int argc, char *argv[]);
-
+void create_process(int argc, char *argv[]);
 /* Enumeration for command types. */
 enum {
 	CMD_ECHO = 0,
@@ -118,6 +118,7 @@ enum {
 	CMD_HISTORY,
 	CMD_MAN,
 	CMD_PS,
+	CMD_EXEC,
 	CMD_COUNT
 } CMD_TYPE;
 /* Structure for command handler. */
@@ -132,7 +133,8 @@ const hcmd_entry cmd_data[CMD_COUNT] = {
 	[CMD_HELP] = {.cmd = "help", .func = show_cmd_info, .description = "List all commands you can use."},
 	[CMD_HISTORY] = {.cmd = "history", .func = show_history, .description = "Show latest commands entered."}, 
 	[CMD_MAN] = {.cmd = "man", .func = show_man_page, .description = "Manual pager."},
-	[CMD_PS] = {.cmd = "ps", .func = show_task_info, .description = "List all the processes."}
+	[CMD_PS] = {.cmd = "ps", .func = show_task_info, .description = "List all the processes."},
+	[CMD_EXEC] = {.cmd = "exec", .func = create_process, .description = "Create a process dynamically"}
 };
 
 /* Structure for environment variables. */
@@ -468,7 +470,7 @@ void serial_test_task()
 				write(fdout, put_ch, 2);
 			}
 		}
-		check_keyword();	
+		check_keyword();
 	}
 }
 
@@ -680,6 +682,16 @@ void show_task_info(int argc, char* argv[])
 		write(fdout, &next_line , 3);
 	}
 }
+void blank_task()
+{
+	while(1);
+}
+/* create_process */
+void create_process(int argc,char *argv[])
+{
+	new_task(blank_task);
+}
+
 
 //this function helps to show int
 
@@ -850,7 +862,13 @@ unsigned int *init_task(unsigned int *stack, void (*start)())
 	stack[8] = (unsigned int)start;
 	return stack;
 }
-
+unsigned int *init_new_task(unsigned int *stack, void (*start)())
+{
+	stack += STACK_SIZE - 18; /* End of stack, minus what we're about to push */
+	stack[16] = (unsigned int)start-1;
+	stack[8] = 0xfffffffd;
+	return stack;
+}
 int
 task_push (struct task_control_block **list, struct task_control_block *item)
 {
@@ -1218,6 +1236,26 @@ int main()
 				tasks[current_task].status = TASK_WAIT_TIME;
 			}
 			break;
+		case 0xa: /* new_task */
+			{
+				void (*function)();
+				function = (void*)tasks[current_task].stack->r0 ;
+				tasks[task_count].stack = (void*)init_new_task(stacks[task_count], function);
+				/* Set PID */
+				tasks[task_count].pid = task_count;
+				/* Set priority, inherited from forked task */
+				tasks[task_count].priority = PRIORITY_DEFAULT;
+				/* Set return values in each process */
+				tasks[current_task].stack->r0 = task_count;
+				tasks[task_count].stack->r0 = 0;
+				tasks[task_count].stack->xpsr = tasks[current_task].stack->xpsr;
+				tasks[task_count].prev = NULL;
+				tasks[task_count].next = NULL;
+				task_push(&ready_list[tasks[task_count].priority], &tasks[task_count]);
+				/* There is now one more task */
+				task_count++;
+			}
+
 		default: /* Catch all interrupts */
 			if ((int)tasks[current_task].stack->r7 < 0) {
 				unsigned int intr = -tasks[current_task].stack->r7 - 16;
