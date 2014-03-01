@@ -864,6 +864,30 @@ unsigned int *init_task(unsigned int *stack, void (*start)())
 }
 unsigned int *init_new_task(unsigned int *stack, void (*start)())
 {
+	/* when a task about to create,activate push r7
+	 * svc takes an exception,and push information onto current stack
+	 * which is called exception entry { xpsr, lr, pc, r12, r3, r2, r1, r0}
+	 * after that, context_switch.s :35 :36 push 10 registers onto stack 
+	 * so the current stack looks like:
+	 *	r4	stack[0]
+	 *	r5
+	 *	r6
+	 *	r7
+	 *	r8 
+	 *	r9
+	 *	r10
+	 *	r11
+	 *	lr	stack[8]	exception return
+	 *	r7
+	 *	r0
+	 *	r1
+	 *	r2
+	 *	r3
+	 *	r12
+	 *	pc			
+	 *	xpsr	stack[16]	start from here
+	 *	r7			push in activate 
+	 */
 	stack += STACK_SIZE - 18; /* End of stack, minus what we're about to push */
 	stack[16] = (unsigned int)start-1;
 	stack[8] = 0xfffffffd;
