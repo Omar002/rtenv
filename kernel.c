@@ -888,6 +888,7 @@ unsigned int *init_new_task(unsigned int *stack, void (*start)())
 	 *	xpsr	stack[16]	start from here
 	 *	r7			push in activate 
 	 */
+	 
 	stack += STACK_SIZE - 18; /* End of stack, minus what we're about to push */
 	stack[16] = (unsigned int)start-1;
 	stack[8] = 0xfffffffd;
