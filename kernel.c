@@ -2,8 +2,9 @@
 #include "RTOSConfig.h"
 #include "core_cm3.h"
 #include "syscall.h"
-
 #include <stddef.h>
+
+typedef void (*ProgramEntry)();
 
 void *memcpy(void *dest, const void *src, size_t n);
 void check_keyword();
@@ -862,7 +863,7 @@ unsigned int *init_task(unsigned int *stack, void (*start)())
 	stack[8] = (unsigned int)start;
 	return stack;
 }
-unsigned int *init_new_task(unsigned int *stack, void (*start)())
+unsigned int *init_new_task(unsigned int *stack, ProgramEntry start)
 {
 	/* when a task about to create,activate push r7
 	 * svc takes an exception,and push information onto current stack
@@ -1137,6 +1138,7 @@ _mknod(struct pipe_ringbuffer *pipe, int dev)
 	return 0;
 }
 
+
 int main()
 {
 	unsigned int stacks[TASK_LIMIT][STACK_SIZE];
@@ -1269,9 +1271,9 @@ int main()
 				}
 				else
 				{
-					void (*function)();
-					function = (void*)tasks[current_task].stack->r0 ;
-					tasks[task_count].stack = (void*)init_new_task(stacks[task_count], function);
+					ProgramEntry program_entry;
+					program_entry = (ProgramEntry)tasks[current_task].stack->r0 ;
+					tasks[task_count].stack = (void*)init_new_task(stacks[task_count], program_entry);
 					/* Set PID */
 					tasks[task_count].pid = task_count;
 					/* Set priority, inherited from forked task */
