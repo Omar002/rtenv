@@ -1263,22 +1263,30 @@ int main()
 			break;
 		case 0xa: /* new_task */
 			{
-				void (*function)();
-				function = (void*)tasks[current_task].stack->r0 ;
-				tasks[task_count].stack = (void*)init_new_task(stacks[task_count], function);
-				/* Set PID */
-				tasks[task_count].pid = task_count;
-				/* Set priority, inherited from forked task */
-				tasks[task_count].priority = PRIORITY_DEFAULT;
-				/* Set return values in each process */
-				tasks[current_task].stack->r0 = task_count;
-				tasks[task_count].stack->r0 = 0;
-				tasks[task_count].stack->xpsr = tasks[current_task].stack->xpsr;
-				tasks[task_count].prev = NULL;
-				tasks[task_count].next = NULL;
-				task_push(&ready_list[tasks[task_count].priority], &tasks[task_count]);
-				/* There is now one more task */
-				task_count++;
+				if(task_count == TASK_LIMIT)
+				{
+					tasks[current_task].stack->r0 = -1;
+				}
+				else
+				{
+					void (*function)();
+					function = (void*)tasks[current_task].stack->r0 ;
+					tasks[task_count].stack = (void*)init_new_task(stacks[task_count], function);
+					/* Set PID */
+					tasks[task_count].pid = task_count;
+					/* Set priority, inherited from forked task */
+					tasks[task_count].priority = PRIORITY_DEFAULT;
+					/* Set return values in each process */
+					tasks[current_task].stack->r0 = task_count;
+					tasks[task_count].stack->r0 = 0;
+					tasks[task_count].stack->xpsr = tasks[current_task].stack->xpsr;
+					tasks[task_count].prev = NULL;
+					tasks[task_count].next = NULL;
+					task_push(&ready_list[tasks[task_count].priority], &tasks[task_count]);
+					/* There is now one more task */
+					task_count++;
+				}
+				
 			}
 
 		default: /* Catch all interrupts */
