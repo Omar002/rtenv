@@ -3,73 +3,24 @@
 	.fpu softvfp
 	.thumb
 
-.global fork
-fork:
+
+.macro SYSCALL syscall_name syscall_number 
+	.global \syscall_name
+\syscall_name:
 	push {r7}
-	mov r7, #0x1
+	mov r7, \syscall_number
 	svc 0
 	pop {r7}
 	bx lr
-.global getpid
-getpid:
-	push {r7}
-	mov r7, #0x2
-	svc 0
-	pop {r7}
-	bx lr
-.global write
-write:
-	push {r7}
-	mov r7, #0x3
-	svc 0
-	pop {r7}
-	bx lr
-.global read
-read:
-	push {r7}
-	mov r7, #0x4
-	svc 0
-	pop {r7}
-	bx lr
-.global interrupt_wait
-interrupt_wait:
-	push {r7}
-	mov r7, #0x5
-	svc 0
-	pop {r7}
-	bx lr
-.global getpriority
-getpriority:
-	push {r7}
-	mov r7, #0x6
-	svc 0
-	pop {r7}
-	bx lr
-.global setpriority
-setpriority:
-	push {r7}
-	mov r7, #0x7
-	svc 0
-	pop {r7}
-	bx lr
-.global mknod
-mknod:
-	push {r7}
-	mov r7, #0x8
-	svc 0
-	pop {r7}
-	bx lr
-.global sleep
-sleep:
-	push {r7}
-	mov r7, #0x9
-	svc 0
-	pop {r7}
-	bx lr
-.global new_task
-new_task:
-	push {r7}
-	mov r7, #0xa
-	svc 0
-	pop {r7}
-	bx lr
+.endm
+
+SYSCALL fork 0x1
+SYSCALL getpid 0x2
+SYSCALL write 0x3
+SYSCALL read 0x4
+SYSCALL interrupt_wait 0x5
+SYSCALL getpriority 0x6
+SYSCALL setpriority 0x7
+SYSCALL mknod 0x8
+SYSCALL sleep 0x9
+SYSCALL new_task 0xa
