@@ -4,7 +4,7 @@
 #include "syscall.h"
 #include <stddef.h>
 
-typedef void (*ProgramEntry)();
+typedef void (*task_entry_t)();
 
 void *memcpy(void *dest, const void *src, size_t n);
 void check_keyword();
@@ -863,7 +863,7 @@ unsigned int *init_task(unsigned int *stack, void (*start)())
 	stack[8] = (unsigned int)start;
 	return stack;
 }
-unsigned int *init_new_task(unsigned int *stack, ProgramEntry start)
+unsigned int *init_new_task(unsigned int *stack, task_entry_t start)
 {
 	/* when a task about to create,activate push r7
 	 * svc takes an exception,and push information onto current stack
@@ -1271,8 +1271,8 @@ int main()
 				}
 				else
 				{
-					ProgramEntry program_entry;
-					program_entry = (ProgramEntry)tasks[current_task].stack->r0 ;
+					task_entry_t program_entry;
+					program_entry = (task_entry_t)tasks[current_task].stack->r0 ;
 					tasks[task_count].stack = (void*)init_new_task(stacks[task_count], program_entry);
 					/* Set PID */
 					tasks[task_count].pid = task_count;
