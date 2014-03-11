@@ -41,7 +41,8 @@ main.bin: kernel.c context_switch.s syscall.s syscall.h
 		syscall.s \
 		stm32_p103.c \
 		kernel.c \
-		memcpy.s
+		memcpy.s \
+		unit_test.c
 	$(CROSS_COMPILE)objcopy -Obinary main.elf main.bin
 	$(CROSS_COMPILE)objdump -S main.elf > main.list
 
@@ -130,4 +131,4 @@ check: unit_test.c unit_test.h
 	@pkill -9 $(notdir $(QEMU_STM32))
 
 clean:
-	rm -f *.elf *.bin *.list
+	rm -f *.elf *.bin *.list *.txt

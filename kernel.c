@@ -2,7 +2,6 @@
 #include "RTOSConfig.h"
 #include "core_cm3.h"
 #include "syscall.h"
-#include <stddef.h>
 #include "kernel.h"
 
 void *malloc(size_t size)
@@ -37,6 +36,16 @@ int strncmp(const char *a, const char *b, size_t n)
 			return a[i] - b[i];
 
 	return 0;
+}
+
+
+char *strcpy(char *s1, const char *s2) __attribute__ ((naked));
+char *strcpy(char *s1, const char *s2)
+{
+	char *s = s1;
+	while( (*s++ = *s2++) !=0)
+		;
+	return (s1);
 }
 
 size_t strlen(const char *s) __attribute__ ((naked));

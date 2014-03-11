@@ -1,6 +1,8 @@
 #ifndef KERNEL_H
 #define KERNEL_H
 
+#include <stddef.h>
+
 #define MAX_CMDNAME 19
 #define MAX_ARGC 19
 #define MAX_CMDHELP 1023
