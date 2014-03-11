@@ -14,13 +14,13 @@ int strcmp(const char *a, const char *b) __attribute__ ((naked));
 int strcmp(const char *a, const char *b)
 {
 	asm(
-        "strcmp_lop:                \n"
+        "strcmp_loop:                \n"
         "   ldrb    r2, [r0],#1     \n"
         "   ldrb    r3, [r1],#1     \n"
         "   cmp     r2, #1          \n"
         "   it      hi              \n"
         "   cmphi   r2, r3          \n"
-        "   beq     strcmp_lop      \n"
+        "   beq     strcmp_loop      \n"
 		"	sub     r0, r2, r3  	\n"
         "   bx      lr              \n"
 		:::
@@ -42,10 +42,15 @@ int strncmp(const char *a, const char *b, size_t n)
 char *strcpy(char *s1, const char *s2) __attribute__ ((naked));
 char *strcpy(char *s1, const char *s2)
 {
-	char *s = s1;
-	while( (*s++ = *s2++) !=0)
-		;
-	return (s1);
+	asm(
+		"strcpy_loop:				\n"
+		"	ldrb 	r2,	[r1],	#1	\n"
+		"	strb 	r2,	[r0],	#1	\n"
+		"	cmp		r2,	#0			\n"
+		"	bne		strcpy_loop		\n"
+		"	bx		lr				\n"
+		:::
+		);
 }
 
 size_t strlen(const char *s) __attribute__ ((naked));
