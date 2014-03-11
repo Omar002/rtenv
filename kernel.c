@@ -586,9 +586,8 @@ void show_task_info(int argc, char* argv[])
 		task_info_pid[0]='0'+tasks[task_i].pid;
 		task_info_pid[1]='\0';
 		task_info_status[0]='0'+tasks[task_i].status;
-		task_info_status[1]='\0';			
-
-		itoa(tasks[task_i].priority, task_info_priority, 10);
+		task_info_status[1]='\0';
+		strcpy(task_info_priority,itoa(tasks[task_i].priority));
 
 		write(fdout, &task_info_pid , 2);
 		write_blank(3);
@@ -612,26 +611,31 @@ void create_process(int argc,char *argv[])
 
 //this function helps to show int
 
-void itoa(int n, char *dst, int base)
+char *itoa(i)
+		int i;
 {
-	char buf[33] = {0};
-	char *p = &buf[32];
-
-	if (n == 0)
-		*--p = '0';
-	else {
-		char *q;
-		unsigned int num = (base == 10 && num < 0) ? -n : n;
-
-		for (; num; num/=base)
-			*--p = "0123456789ABCDEF" [num % base];
-		if (base == 10 && n < 0)
-			*--p = '-';
+	static char buf[INT_DIGITS + 2];
+	char *p = buf + INT_DIGITS +1;
+	if( i >= 0)
+	{
+		do
+		{
+			*--p = '0' + ( i % 10);
+			i /= 10;
+		}while ( i != 0);
+		return p;
 	}
-
-	strcpy(dst, p);
+	else
+	{
+		do
+		{
+			*--p = '0' - ( i % 10 );
+			i /= 10;
+		}while( i !=0 );
+		*--p = '-';
+	}
+	return p;
 }
-
 //help
 
 void show_cmd_info(int argc, char* argv[])

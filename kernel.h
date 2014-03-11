@@ -11,7 +11,7 @@
 #define MAX_ENVCOUNT 30
 #define MAX_ENVNAME 15
 #define MAX_ENVVALUE 127
-
+#define INT_DIGITS 19
 
 #define STACK_SIZE 512 /* Size of task stacks in words */
 #define TASK_LIMIT 8  /* Max number of tasks we can handle */
@@ -76,7 +76,7 @@ typedef struct {
 void *memcpy(void *dest, const void *src, size_t n);
 void check_keyword();
 void find_events();
-void itoa(int n, char *dst, int base);
+char *itoa(int);
 
 
 
